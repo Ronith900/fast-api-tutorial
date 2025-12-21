@@ -1,0 +1,36 @@
+from sqlalchemy import create_engine
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker
+
+# -------------------------
+# DATABASE CONFIG
+# -------------------------
+
+DATABASE_URL = "sqlite:///./blog.db"
+# For Postgres later:
+# DATABASE_URL = "postgresql+psycopg2://user:password@localhost/dbname"
+
+engine = create_engine(
+    DATABASE_URL,
+    connect_args={"check_same_thread": False}  # needed only for SQLite
+)
+
+SessionLocal = sessionmaker(
+    autocommit=False,
+    autoflush=False,
+    bind=engine
+)
+
+Base = declarative_base()
+
+
+def get_db():
+    """
+    FastAPI dependency.
+    Yields a database session and closes it after request.
+    """
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
