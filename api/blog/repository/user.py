@@ -1,17 +1,14 @@
 
 from sqlalchemy.orm import Session
-from .. import models,schemas
+from .. import models,schemas, token
 from ..database import get_db
-from pwdlib import PasswordHash
 
 
 from fastapi import Depends, HTTPException,status
 
-password_hash = PasswordHash.recommended()
 
 def create_user(request: schemas.User,db: Session = Depends(get_db)):
-    hash_pw = password_hash.hash(request.password)
-    new_user = models.User(name=request.name.title(),email=request.email,password=hash_pw)
+    new_user = models.User(name=request.name.title(),email=request.email,password=token.get_password_hash(request.password))
     db.add(new_user)
     db.commit()
     db.refresh(new_user)

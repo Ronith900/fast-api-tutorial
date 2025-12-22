@@ -8,17 +8,17 @@ from fastapi import Depends, HTTPException,status
 
 
 
-def show_all(db: Session):
-    blogs = db.query(models.Blog).all()
+def show_all(db: Session,user_id: int):
+    blogs = db.query(models.Blog).filter(models.Blog.user_id == user_id)
     return blogs
 
 
-def create(request: schemas.Blog, db: Session = Depends(get_db)):
+def create(request: schemas.Blog,user_id: int ,db: Session = Depends(get_db)):
     print(f'received request body {request}')
     db_blog = models.Blog(
         title=request.title,
         body=request.body,
-        user_id=1
+        user_id=user_id
     )
     db.add(db_blog)
     db.commit()

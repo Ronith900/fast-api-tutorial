@@ -1,5 +1,5 @@
 from typing import List
-from .. import schemas
+from .. import schemas,token
 from ..database import engine,get_db
 from fastapi import Depends, status, Response, APIRouter
 
@@ -16,14 +16,14 @@ router = APIRouter(
 
 
 @router.post("/",status_code=status.HTTP_201_CREATED)
-def create(request: schemas.Blog, db: Session = Depends(get_db)):
-    return blog.create(request,db)
+def create(request: schemas.Blog, db: Session = Depends(get_db),get_current_user: schemas.User = Depends(token.get_current_user)):
+    return blog.create(request,get_current_user.user_id,db)
 
 
 
 @router.get("/",response_model=List[schemas.ShowBlog])
-def all(db: Session = Depends(get_db)):
-    return blog.show_all(db)
+def all(db: Session = Depends(get_db),get_current_user: schemas.User = Depends(token.get_current_user)):
+    return blog.show_all(db,get_current_user.user_id)
 
 
 @router.put("/{id}",status_code=status.HTTP_202_ACCEPTED,tags=['blogs'])
