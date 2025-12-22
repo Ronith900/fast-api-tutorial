@@ -4,3 +4,4 @@ venv
 *.pyc
 .vscode
 blog.db
+blog.db
